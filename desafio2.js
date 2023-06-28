@@ -9,8 +9,11 @@ const fs = require('fs');
   }
   
 
- addProduct(product) {
+ async addProduct(product) {
 
+  const data = await fs.promises.readFile(this.path, 'utf-8')
+  this.products = JSON.parse(data)
+  
 const newProduct = {
         id: this.products.length + 1, 
         title: product.title,
@@ -19,7 +22,6 @@ const newProduct = {
         thumbanail: product.thumbanail,
         code: product.code,
         stock: product.stock
-
 }
     if (
       !product.title ||
@@ -31,8 +33,8 @@ const newProduct = {
     ) {
       return console.log("Error: Todos los campos son obligatorios.");
     }
-
-    const existingProduct = this.products.find((p) => p.code === product.code);
+    
+     const existingProduct = this.products.find((p) => p.code === product.code);
     if (existingProduct) {
       return console.log("Error: El código del producto ya existe.");
     }
