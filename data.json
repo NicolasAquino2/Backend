@@ -9,11 +9,11 @@
   },
   {
     "id": 2,
-    "title": "remeron",
-    "description": "remera deportivas",
-    "price": 80,
-    "code": "9809",
-    "stock": 3
+    "title": "pantalon corto",
+    "description": "pantalon corto",
+    "price": 12,
+    "code": "3891",
+    "stock": 98
   },
   {
     "id": 3,
@@ -78,5 +78,29 @@
     "price": 200,
     "code": "3832",
     "stock": 100
+  },
+  {
+    "id": 11,
+    "title": "remeron",
+    "description": "remera deportivas",
+    "price": 80,
+    "code": "9809",
+    "stock": 3
+  },
+  {
+    "id": 12,
+    "title": "guantes",
+    "description": "guantes de lana",
+    "price": 144,
+    "code": "3053",
+    "stock": 23
+  },
+  {
+    "id": 13,
+    "title": "sombrero",
+    "description": "sombrero",
+    "price": 144,
+    "code": "0931",
+    "stock": 23
   }
 ]
