@@ -89,17 +89,10 @@
   },
   {
     "id": 12,
-    "title": "guantes",
-    "description": "guantes de lana",
-    "price": 144,
-    "code": "3053",
-    "stock": 23
-  },
-  {
-    "id": 13,
     "title": "sombrero",
     "description": "sombrero",
     "price": 144,
+    "thumbanail": "img/sombrero.jpg",
     "code": "0931",
     "stock": 23
   }

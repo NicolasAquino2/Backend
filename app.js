@@ -13,5 +13,3 @@ app.use('/api/carts', cartRouter);
 app.listen(8080, () => {
   console.log('Servidor express escuchando en el puerto 8080');
 });
-
-

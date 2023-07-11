@@ -19,7 +19,7 @@ const newProduct = {
         title: product.title,
         description: product.description,
         price: product.price,
-        thumbanail: product.thumbanail,
+        thumbanail: product.thumbnails,
         code: product.code,
         stock: product.stock
 }
@@ -27,7 +27,7 @@ const newProduct = {
       !product.title ||
       !product.description ||
       !product.price ||
-      !product.thumbnail ||
+      !product.thumbnails ||
       !product.code ||
       !product.stock
     ) {
@@ -88,7 +88,7 @@ getProductById(id) {
         products[productIndex].title = updateProduct.title;
         products[productIndex].description = updateProduct.description;
         products[productIndex].price = updateProduct.price;
-        products[productIndex].thumbnail = updateProduct.thumbnail;
+        products[productIndex].thumbnails = updateProduct.thumbnails;
         products[productIndex].code = updateProduct.code;
         products[productIndex].stock = updateProduct.stock;
 
@@ -138,7 +138,7 @@ manager.addProduct({
   title: "Zapatillas",
   description: "Zapatillas deportivas",
   price: 59.99,
-  thumbnail: "img/zapatillas.jpg",
+  thumbnails: "img/zapatillas.jpg",
   code: "2345",
   stock: 10,
 });
@@ -147,7 +147,7 @@ manager.addProduct({
   title: "remeron",
   description: "remera deportivas",
   price: 80,
-  thumbnail: "img/zapatillas.jpg",
+  thumbnails: "img/zapatillas.jpg",
   code: "9809",
   stock: 3,
 });
@@ -156,7 +156,7 @@ manager.addProduct({
   title: "musculosa",
   description: "musculosa deportivas",
   price: 80,
-  thumbnail: "img/musculosa.jpg",
+  thumbnails: "img/musculosa.jpg",
   code: "8760",
   stock: 10,
 });
@@ -165,7 +165,7 @@ manager.addProduct({
   title: "buzo",
   description: "buzo de algodon",
   price: 100,
-  thumbnail: "img/buzo.jpg",
+  thumbnails: "img/buzo.jpg",
   code: "7635",
   stock: 100,
 }); 
@@ -174,7 +174,7 @@ manager.addProduct({
   title: "medias",
   description: "medias negras",
   price: 88,
-  thumbnail: "img/medias.jpg",
+  thumbnails: "img/medias.jpg",
   code: "0936",
   stock: 100,
 });
@@ -183,7 +183,7 @@ manager.addProduct({
   title: "campera",
   description: "campera desportiva",
   price: 200,
-  thumbnail: "img/campera.jpg",
+  thumbnails: "img/campera.jpg",
   code: "1463",
   stock: 388,
 });
@@ -192,7 +192,7 @@ manager.addProduct({
   title: "musculosa",
   description: "musculosa deportivas",
   price: 80,
-  thumbnail: "img/musculosa.jpg",
+  thumbnails: "img/musculosa.jpg",
   code: "8760",
   stock: 10,
 });
@@ -201,7 +201,7 @@ manager.addProduct({
   title: "chaqueta",
   description: "chaqueta de cuero",
   price: 200,
-  thumbnail: "img/chaqueta.jpg",
+  thumbnails: "img/chaqueta.jpg",
   code: "6730",
   stock: 10,
 });
@@ -210,7 +210,7 @@ manager.addProduct({
   title: "short",
   description: "short deportivas",
   price: 80,
-  thumbnail: "img/short.jpg",
+  thumbnails: "img/short.jpg",
   code: "6301",
   stock: 50,
 });
@@ -219,7 +219,7 @@ manager.addProduct({
   title: "camperon",
   description: "camperon de invierno",
   price: 300,
-  thumbnail: "img/camperon.jpg",
+  thumbnails: "img/camperon.jpg",
   code: "1835",
   stock: 102,
 });
@@ -228,38 +228,13 @@ manager.addProduct({
   title: "polera",
   description: "polera de lana",
   price: 200,
-  thumbnail: "img/polera.jpg",
+  thumbnails: "img/polera.jpg",
   code: "3832",
   stock: 100,
 });
 
-manager.getProducts()
-  .then((products) => {
-    console.log(products);
-  })
-  .catch((err) => {
-    console.error('Error al obtener los productos:', err);
-  });
 
-manager.getProductById(2)
-  .then((product) => {
-    console.log(product);
-  })
-  .catch((err) => {
-    console.error('Error al obtener el producto:', err);
-  });
 
-manager.updateProduct( {
-
-  title: "pantalon",
-  description: "pantalon de algodon",
-  price: 30,
-  thumbnail: "img/pantalon.jpg",
-  code: "55544",
-  stock: 10,
-
-})
-manager.deleteProduct()
 
 
 module.exports = ProductManager

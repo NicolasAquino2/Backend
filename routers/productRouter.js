@@ -27,14 +27,14 @@ productRouter.get('/', async (req, res) => {
       if (product) {
         res.json(product);
       } else {
-        console.log('producto no encontrado');
+        res.status(404).json({ error: 'Producto no encontrado' });
       }
     } catch (error) {
       console.error('Error al obtener el producto:', error);
-     
+      res.status(500).json({ error: 'Error interno del servidor' });
     }
   });
-
+  
   productRouter.post('/', async (req, res) => {
     try {
       const productData = req.body; 

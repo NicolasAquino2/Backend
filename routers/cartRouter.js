@@ -2,48 +2,36 @@ const express = require('express');
 const cartRouter = express.Router();
 const CartManager = require('../cart');
 
+
 const cartManager = new CartManager('./cart.json');
 
-
-cartRouter.post('/', (req, res) => {
-  const cartId = cartManager.lastCartId + 1;
-  const cart = { id: cartId, products: [] };
-  cartManager.carts.push(cart);
-  cartManager.lastCartId = cartId;
+cartRouter.post('/', async (req, res) => {
+  const cartId = cartManager.createCart(); // Llamar al método createCart en la instancia cartManager
+  const cart = await cartManager.getCartById(cartId);
   cartManager.saveCarts();
   res.status(201).json(cart);
 });
 
-cartRouter.get('/:cid', (req, res) => {
+cartRouter.get('/:cid', async (req, res) => {
   const cartId = parseInt(req.params.cid);
-  const cart = cartManager.getCartById(cartId);
+  const cart = await cartManager.getCartById(cartId);
   if (cart) {
-    res.json(cart);
+    const carts = cartManager.getCarts();
+    res.json({ cart, allCarts: carts });
   } else {
     res.status(404).json({ error: 'Carrito no encontrado' });
   }
 });
 
-cartRouter.post('/:cid/product/:pid', (req, res) => {
+
+cartRouter.post('/:cid/product/:pid', async (req, res) => {
   const cartId = parseInt(req.params.cid);
   const productId = parseInt(req.params.pid);
   const quantity = 1;
 
-  const cart = cartManager.getCartById(cartId);
-  if (!cart) {
-    res.status(404).json({ error: 'Carrito no encontrado' });
-    return;
-  }
-
-  const existingProduct = cart.products.find((product) => product.id === productId);
-  if (existingProduct) {
-    existingProduct.quantity += quantity;
-  } else {
-    const newProduct = { id: productId, quantity };
-    cart.products.push(newProduct);
-  }
-
+  await cartManager.addToCart(cartId, productId, quantity);
   cartManager.saveCarts();
+  const cart = await cartManager.getCartById(cartId);
   res.json(cart);
 });
 
