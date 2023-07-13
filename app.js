@@ -26,6 +26,3 @@ app.use('/realtimeproducts', viewRouter);
 app.use(express.static('public'));
 
 
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en el puerto ${PORT}`);
-});
