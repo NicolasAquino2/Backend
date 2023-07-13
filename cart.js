@@ -6,7 +6,7 @@ class CartManager {
     this.path = path;
     this.lastCartId = 0;
 
-    // Leer los carritos existentes en el archivo al iniciar
+  
     this.loadCarts();
   }
 
@@ -64,7 +64,6 @@ class CartManager {
       const data = fs.readFileSync(this.path, 'utf-8');
       if (data) {
         this.carts = JSON.parse(data);
-        // Actualizar lastCartId según el carrito con el ID más alto encontrado
         const cartIds = this.carts.map((cart) => parseInt(cart.id));
         this.lastCartId = Math.max(...cartIds);
       }
