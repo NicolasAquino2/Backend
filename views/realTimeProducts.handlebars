@@ -3,7 +3,6 @@
 <head>
   <meta charset="utf-8">
   <title>Real-Time Products</title>
- 
 </head>
 <body>
   <h1>Real-Time Products</h1>
@@ -14,31 +13,13 @@
     {{/each}}
   </ul>
 
-
   <form action="/realtimeproducts" method="POST">
     <input type="text" name="title" placeholder="Título">
     <input type="text" name="price" placeholder="Precio">
     <button type="submit">Agregar Producto</button>
   </form>
 
+  <script src="/js/socket.js"></script>
 
-  <script>
-    const socket = io(); 
-
-    socket.on('newProduct', (product) => {
-      const productList = document.getElementById('productList');
-      const li = document.createElement('li');
-      li.textContent = `${product.title} - ${product.price}`;
-      productList.appendChild(li);
-    });
-
-    socket.on('productDeleted', (productId) => {
-      const productList = document.getElementById('productList');
-      const productItem = productList.querySelector(`li[data-product-id="${productId}"]`);
-      if (productItem) {
-        productItem.remove();
-      }
-    });
-  </script>
 </body>
 </html>
