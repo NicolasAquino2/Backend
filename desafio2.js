@@ -33,6 +33,26 @@ class ProductManager {
     this.guardarProductos();
     console.log("Producto agregado correctamente.");
   }
+  async addProductDos(product) {
+    const data = await fs.promises.readFile(this.path, 'utf-8');
+    this.products = JSON.parse(data);
+
+    const newProduct = {
+      id: this.products.length + 1,
+      title: product.title,
+      price: product.price
+     
+    };
+
+    if (!product.title || !product.price) {
+      return console.log("Error: Todos los campos son obligatorios.");
+    }
+
+    this.products.push(newProduct);
+    this.guardarProductos();
+    console.log("Producto agregado correctamente.");
+    io.emit('newProduct', newProduct);
+  }
 
   async getProducts() {
     try {

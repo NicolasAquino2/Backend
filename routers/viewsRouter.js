@@ -1,3 +1,5 @@
+
+
 const express = require('express');
 const viewRouter = express.Router();
 const ProductManager = require('../desafio2');
@@ -6,7 +8,7 @@ const { Server } = require('socket.io');
 const productManager = new ProductManager('./data.json');
 const io = new Server();
 
-viewRouter.get('/', async (req, res) => {
+viewRouter.get('/home', async (req, res) => {
   try {
     const products = await productManager.getProducts();
     res.render('home', { products });
@@ -16,7 +18,7 @@ viewRouter.get('/', async (req, res) => {
   }
 });
 
-viewRouter.get('/', async (req, res) => {
+viewRouter.get('/realtimeproducts', async (req, res) => {
   try {
     const products = await productManager.getProducts();
     res.render('realTimeProducts', { products });
@@ -26,10 +28,10 @@ viewRouter.get('/', async (req, res) => {
   }
 });
 
-viewRouter.post('/', async (req, res) => {
+viewRouter.post('/realtimeproducts', async (req, res) => {
   try {
     const productData = req.body;
-    await productManager.addProduct(productData);
+    await productManager.addProductDos(productData);
     const products = await productManager.getProducts();
     io.emit('newProduct', productData);
     res.render('realTimeProducts', { products });
@@ -40,3 +42,4 @@ viewRouter.post('/', async (req, res) => {
 });
 
 module.exports = viewRouter;
+

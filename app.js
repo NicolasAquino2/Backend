@@ -17,13 +17,14 @@ setupSocketEvents(io);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(express.static('public'));
 
 app.engine('handlebars', handlebars.engine());
-app.set('views', '/views');
+app.set('view engine', 'handlebars')
+app.set('views', './views');
 
 app.use('/api/products', productRouter);
-app.use('/home', viewRouter);
-app.use('/realtimeproducts', viewRouter);
+app.use('/', viewRouter);
+app.use('/', viewRouter);
 
-app.use(express.static('public'));
+

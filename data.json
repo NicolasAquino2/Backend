@@ -95,5 +95,20 @@
     "thumbanail": "img/sombrero.jpg",
     "code": "0931",
     "stock": 23
+  },
+  {
+    "id": 13,
+    "title": "ss",
+    "price": "122"
+  },
+  {
+    "id": 14,
+    "title": "ss",
+    "price": "122"
+  },
+  {
+    "id": 15,
+    "title": "ss",
+    "price": "122"
   }
 ]

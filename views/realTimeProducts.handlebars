@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
+  
   <meta charset="utf-8">
   <title>Real-Time Products</title>
 </head>
 <body>
+
+  <script src="/socket.io/socket.io.js"></script>
   <h1>Real-Time Products</h1>
 
   <ul id="productList">
     {{#each products}}
     <li>{{this.title}} - {{this.price}}</li>
+    
     {{/each}}
   </ul>
 
