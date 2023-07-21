@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-  
   <meta charset="utf-8">
   <title>Real-Time Products</title>
 </head>
 <body>
-
   <script src="/socket.io/socket.io.js"></script>
   <h1>Real-Time Products</h1>
 
   <ul id="productList">
     {{#each products}}
-    <li>{{this.title}} - {{this.price}}</li>
-    
+    <li id="product-{{this.id}}">
+      <p>Título: {{this.title}}</p>
+      <p>Precio: {{this.price}}</p>
+      <button class="delete-button" data-product-id="{{this.id}}">Eliminar</button>
+    </li>
     {{/each}}
   </ul>
 
@@ -23,7 +24,7 @@
     <button type="submit">Agregar Producto</button>
   </form>
 
+  <script src="/js/delete.js"></script>
   <script src="/js/socket.js"></script>
-
 </body>
 </html>

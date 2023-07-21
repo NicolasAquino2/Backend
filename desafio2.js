@@ -51,7 +51,7 @@ class ProductManager {
     this.products.push(newProduct);
     this.guardarProductos();
     console.log("Producto agregado correctamente.");
-    io.emit('newProduct', newProduct);
+    
   }
 
   async getProducts() {

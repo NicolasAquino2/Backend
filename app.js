@@ -12,6 +12,7 @@ const server = app.listen(PORT, () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
 
+
 const io = new Server(server);
 setupSocketEvents(io);
 
