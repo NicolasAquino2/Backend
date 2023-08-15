@@ -1,19 +1,34 @@
+
+
 const socket = io();
 
 
+const updateProductList = (products) => {
+ 
+  const productList = document.querySelector('#productList');
+  productList.innerHTML = ''; 
 
-socket.on('newProduct', (product) => {
-  const productList = document.getElementById('productList');
-  const li = document.createElement('li');
-  li.textContent = `${product.title} - ${product.price}`;
-  productList.appendChild(li);
+  products.forEach(product => {
+    const productItem = document.createElement('li');
+    productItem.innerHTML = `
+      <h2>${product.title}</h2>
+      <p>Price: ${product.price}</p>
+      <p>Description: ${product.description}</p>
+      <!-- You can add more details here -->
+    `;
+    productList.appendChild(productItem);
+  });
+};
+
+
+socket.on('newProduct', (newProduct) => {
+
+  updateProductList([newProduct, ...products]);
 });
 
-socket.on('productDeleted', (deletedProductId) => {
-  const productElement = document.getElementById(`product-${deletedProductId}`);
-  if (productElement) {
-    productElement.remove();
-  }
+
+socket.on('productDeleted', (productId) => {
+ 
+  products = products.filter(product => product.id !== productId);
+  updateProductList(products);
 });
-
-

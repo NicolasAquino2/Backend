@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product List</title>
+</head>
+<body>
+  <h1>Product List</h1>
+  
+  <ul>
+    {{#each products}}
+    <li>
+      <h2>{{this.title}}</h2>
+      <p>Price: {{this.price}}</p>
+      <p>Description: {{this.description}}</p>
+      <!-- Puedes mostrar más detalles del producto aquí si lo deseas -->
+    </li>
+    {{/each}}
+  </ul>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/public/js/socket.js"></script>
+</body>
+</html>

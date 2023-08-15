@@ -1,30 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Real-Time Products</title>
 </head>
 <body>
-  <script src="/socket.io/socket.io.js"></script>
   <h1>Real-Time Products</h1>
 
-  <ul id="productList">
-    {{#each products}}
-    <li id="product-{{this.id}}">
-      <p>Título: {{this.title}}</p>
-      <p>Precio: {{this.price}}</p>
-      <button class="delete-button" data-product-id="{{this.id}}">Eliminar</button>
-    </li>
-    {{/each}}
-  </ul>
+  <table>
+    <thead>
+      <tr>
+        <th>Título</th>
+        <th>Precio</th>
+        <th>Categoría</th>
+      
+      </tr>
+    </thead>
+    <tbody>
+      {{#each products}}
+      <tr>
+        <td>{{this.title}}</td>
+        <td>{{this.price}}</td>
+        <td>{{this.category}}</td>
+       
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
 
-  <form action="/realtimeproducts" method="POST">
-    <input type="text" name="title" placeholder="Título">
-    <input type="text" name="price" placeholder="Precio">
-    <button type="submit">Agregar Producto</button>
-  </form>
-
-  <script src="/js/delete.js"></script>
-  <script src="/js/socket.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/public/js/socket.js"></script>
 </body>
 </html>
