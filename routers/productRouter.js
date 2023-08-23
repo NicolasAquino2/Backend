@@ -3,10 +3,10 @@ const productRouter = Router();
 const ProductManagerMongo = require('../desafio2');
 const manager = new ProductManagerMongo();
 
-productRouter.get('/', async (req, res) => {
+productRouter.get('/api/realTimeProducts', async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit) || 10;
-    const page = parseInt(req.query.page) || 1;
+    const limit =req.query.limit || 10;
+    const page = req.query.page || 1;
     const sort = req.query.sort === 'desc' ? -1 : 1;
     const query = req.query.query || '';
 
@@ -19,12 +19,12 @@ productRouter.get('/', async (req, res) => {
 
     const totalProducts = await manager.model.countDocuments(filter);
     const totalPages = Math.ceil(totalProducts / limit);
-
+console.log(totalProducts)
     const hasPrevPage = page > 1;
     const hasNextPage = page < totalPages;
 
-    const prevLink = hasPrevPage ? `/api/productsMongo?limit=${limit}&page=${page - 1}&sort=${req.query.sort}&query=${query}` : null;
-    const nextLink = hasNextPage ? `/api/productsMongo?limit=${limit}&page=${page + 1}&sort=${req.query.sort}&query=${query}` : null;
+    const prevLink = hasPrevPage ? `/realTimeProducts?limit=${limit}&page=${page - 1}&sort=${req.query.sort}&query=${query}` : null;
+const nextLink = hasNextPage ? `/realTimeProducts?limit=${limit}&page=${page + 1}&sort=${req.query.sort}&query=${query}` : null;
 
     const products = await manager.model
       .find(filter)

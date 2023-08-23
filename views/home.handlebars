@@ -3,10 +3,11 @@
 <head>
  
     <title>Productos</title>
+    <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
     
-<script src="/socket.io/socket.io.js"></script>
+
     <h1>Lista de Productos</h1>
     <ul>
         {{#each products}}
@@ -20,7 +21,9 @@
             </li>
         {{/each}}
     </ul>
-    <script src="/js/socket.js"></script>
+ 
+
+<script src="/js/socket.js"></script>
 
 </body>
 </html>

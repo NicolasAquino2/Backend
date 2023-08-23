@@ -11,6 +11,6 @@ const productSchema = mongoose.Schema({
     stock: Number,
     category: String,
     thumbnails: []
-});
+})
 
 module.exports = mongoose.model('Product', productSchema);

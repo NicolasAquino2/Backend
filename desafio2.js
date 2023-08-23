@@ -1,16 +1,20 @@
 
 
 const productModel = require('./model/product.model')
+
 class ProductManagerMongo {
     constructor(io) {
         this.model = productModel
+        
         this.io = io
+        
     }
+
 
     async getProducts() {
         try {
             const products = await this.model.find()
-            console.log(products)
+          
             return products.map(p => p.toObject())
         } catch (error) {
             throw error
@@ -20,6 +24,7 @@ class ProductManagerMongo {
     async getProductById(id) {
         try {
             const product = await this.model.findById(id)
+           
             if (!product) {
                 throw new Error('No se encuentra el producto')
             }

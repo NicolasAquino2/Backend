@@ -1,35 +1,43 @@
+<!-- En tu archivo realTimeProducts.handlebars -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Real-Time Products</title>
+  <!-- Resto de las etiquetas head ... -->
 </head>
 <body>
   <h1>Real-Time Products</h1>
-
+<script src="/socket.io/socket.io.js"></script>
   <table>
     <thead>
       <tr>
         <th>Título</th>
         <th>Precio</th>
         <th>Categoría</th>
-      
+        <!-- Agrega más encabezados de columna si es necesario -->
       </tr>
     </thead>
     <tbody>
-      {{#each products}}
-      <tr>
-        <td>{{this.title}}</td>
-        <td>{{this.price}}</td>
-        <td>{{this.category}}</td>
-       
-      </tr>
-      {{/each}}
+      <!-- Agrega un identificador al tbody para actualizar el contenido -->
+      <tbody id="productList">
+        {{#each products}}
+        <tr>
+          <td>{{this.title}}</td>
+          <td>{{this.price}}</td>
+          <td>{{this.category}}</td>
+          <!-- Agrega más celdas si es necesario -->
+        </tr>
+        {{/each}}
+      </tbody>
     </tbody>
   </table>
 
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="/public/js/socket.js"></script>
+  <!-- Agrega la etiqueta script para incluir el archivo socket.js -->
+<!-- Agrega la etiqueta script para incluir el archivo socket.io.js -->
+
+
+<script src="/js/socket.js"></script>
+
+
+  
 </body>
 </html>

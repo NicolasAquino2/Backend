@@ -1,34 +1,33 @@
 
-
+// socket.js
 const socket = io();
+const updateProductListUI = require('./realTimeProducts'); // Asegúrate de que la ruta sea correcta
+
+socket.on('newProduct', (newProduct) => {
+  // Actualizar la lista de productos en tiempo real
+  updateProductListUI([newProduct]);
+  console.log(newProduct)
+});
+
+// Otras funciones y lógica relacionada con socket.io
 
 
-const updateProductList = (products) => {
- 
-  const productList = document.querySelector('#productList');
-  productList.innerHTML = ''; 
 
-  products.forEach(product => {
-    const productItem = document.createElement('li');
-    productItem.innerHTML = `
-      <h2>${product.title}</h2>
-      <p>Price: ${product.price}</p>
-      <p>Description: ${product.description}</p>
-      <!-- You can add more details here -->
-    `;
-    productList.appendChild(productItem);
-  });
-};
+// Listen for the 'newProduct' event
+// socket.js
 
 
 socket.on('newProduct', (newProduct) => {
 
-  updateProductList([newProduct, ...products]);
+  updateProductListUI([newProduct]);
 });
 
+// Otras funciones y lógica relacionada con socket.io
 
+
+// Listen for the 'productDeleted' event
 socket.on('productDeleted', (productId) => {
- 
+  // Update the UI by removing the deleted product
   products = products.filter(product => product.id !== productId);
   updateProductList(products);
 });

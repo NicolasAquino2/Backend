@@ -4,11 +4,12 @@ const viewRouter = require('./routers/viewsRouter');
 const productRouter = require('./routers/productRouter');
 const { Server } = require('socket.io');
 const { setupSocketEvents } = require('./utils');
-const mongoose = require('mongoose')
+
 
 const app = express();
 
-const MONGODB_CONECT = 'mongodb+srv://nicolasAquino:yosoynicoa@cluster0.1upobe4.mongodb.net/Products?retryWrites=true&w=majority'
+const mongoose = require('mongoose')
+const MONGODB_CONECT = 'mongodb+srv://nicolasAquino:yosoynicoa@cluster0.1upobe4.mongodb.net/productsMongo?retryWrites=true&w=majority'
 
 mongoose.connect(MONGODB_CONECT)
   .then(() => {
@@ -16,9 +17,8 @@ mongoose.connect(MONGODB_CONECT)
   })
   .catch(err => {
     console.error('No se pudo conectar a la base de datos:', err);
-    process.exit(1); // Salir del proceso con un código de error
+    process.exit(1);
   });
-
 
 
 
@@ -49,9 +49,10 @@ app.set('view engine', 'handlebars')
 app.set('views', './views');
 
 
-app.use('/api/productsMongo', productRouter);
-app.use('/', viewRouter);
-
+app.use('/home', viewRouter);
+app.use('/realTimeProducts', viewRouter);
+app.use('/api/products/:id', viewRouter)
+app.use('/', productRouter)
 
 
 
