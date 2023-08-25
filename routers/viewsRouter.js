@@ -2,14 +2,13 @@ const express = require('express');
 const viewRouter = express.Router();
 const ProductManagerMongo = require('../desafio2');
 const { Server } = require('socket.io');
+const productRouter = require('./productRouter');
 
-// Crear una instancia de Socket.IO
 const io = new Server();
 
-// Crear una instancia de ProductManagerMongo con Socket.IO
 const productManager = new ProductManagerMongo(io);
 
-// ...
+viewRouter.use('/realTimeProducts', productRouter);
 
 viewRouter.get('/', async (req, res) => {
   try {

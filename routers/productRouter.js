@@ -3,12 +3,16 @@ const productRouter = Router();
 const ProductManagerMongo = require('../desafio2');
 const manager = new ProductManagerMongo();
 
-productRouter.get('/api/realTimeProducts', async (req, res) => {
+productRouter.get('/', async (req, res) => {
   try {
     const limit =req.query.limit || 10;
     const page = req.query.page || 1;
     const sort = req.query.sort === 'desc' ? -1 : 1;
     const query = req.query.query || '';
+
+  
+
+
 
     const filter = {
       $or: [
