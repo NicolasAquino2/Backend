@@ -115,16 +115,6 @@ viewsRouter.get('/carts/:cid', requireLogin, async (req, res) => {
     }
 })
 
-/* VISTA DE CHAT */
-
-viewsRouter.get('/chat', async (req, res) => {
-    try {
-        //en esta instancia no se pasan los mensajes para evitar que se puedan visualzar antes de identificarse
-        return res.render('chat', { title: 'Chat', style: 'styles.css' });
-    } catch (error) {
-        res.render('error', { title: 'Error', errorMessage: error.message });
-    }
-})
 
 /* VISTAS DE SISTEMA DE LOGIN */
 
