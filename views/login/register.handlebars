@@ -1,0 +1,28 @@
+<h2>Register</h2>
+<section class="loginSystem">
+    <form action="/api/sessions/register" method="POST" class="form">
+        <label for="name">Name:</label>
+        <input type="text" name="name" id="name" required>
+
+        <label for="lastname">Lastname:</label>
+        <input type="text" name="lastname" id="lastname" required>
+
+        <label for="email">Email:</label>
+        <input type="email" name="email" id="email" required>
+
+        <label for="age">Age:</label>
+        <input type="number" name="age" id="age" required>
+
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password" required>
+
+        <input type="submit" value="Register">
+    </form>
+
+    <a href="/">Do you already have an account? <span class="bold">Sign in</span></a>
+
+    {{#if hasError}}
+    <p class="infoMessage">¡{{messageError}}!</p>
+    {{/if}}
+
+</section>

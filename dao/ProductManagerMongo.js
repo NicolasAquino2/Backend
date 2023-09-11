@@ -1,6 +1,6 @@
 
 
-const productModel = require('./model/product.model')
+const productModel = require('../model/productModel')
 
 class ProductManagerMongo {
     constructor(io) {
@@ -28,7 +28,7 @@ class ProductManagerMongo {
             if (!product) {
                 throw new Error('No se encuentra el producto')
             }
-
+            
             return product
         } catch (error) {
             throw error

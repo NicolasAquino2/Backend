@@ -1,110 +1,113 @@
-const { Router } = require('express');
-const productRouter = Router();
-const ProductManagerMongo = require('../desafio2');
-const manager = new ProductManagerMongo();
+const { Router } = require('express')
+const ProductManagerMongo = require('../dao/ProductManagerMongo')
+const uploader = require('../middlewares/uploader')
+const productsRouter = new Router()
+const productManager = new ProductManagerMongo()
 
-productRouter.get('/', async (req, res) => {
-  try {
-    const limit =req.query.limit || 10;
-    const page = req.query.page || 1;
-    const sort = req.query.sort === 'desc' ? -1 : 1;
-    const query = req.query.query || '';
-
-  
-
-
-
-    const filter = {
-      $or: [
-        { category: query },
-        { status: query }
-      ]
-    };
-
-    const totalProducts = await manager.model.countDocuments(filter);
-    const totalPages = Math.ceil(totalProducts / limit);
-console.log(totalProducts)
-    const hasPrevPage = page > 1;
-    const hasNextPage = page < totalPages;
-
-    const prevLink = hasPrevPage ? `/realTimeProducts?limit=${limit}&page=${page - 1}&sort=${req.query.sort}&query=${query}` : null;
-const nextLink = hasNextPage ? `/realTimeProducts?limit=${limit}&page=${page + 1}&sort=${req.query.sort}&query=${query}` : null;
-
-    const products = await manager.model
-      .find(filter)
-      .sort({ price: sort })
-      .skip((page - 1) * limit)
-      .limit(limit);
-
-    const response = {
-      status: 'success',
-      payload: products,
-      totalPages,
-      prevPage: page - 1,
-      nextPage: page + 1,
-      page,
-      hasPrevPage,
-      hasNextPage,
-      prevLink,
-      nextLink
-    };
-
-    res.status(200).json(response);
-  } catch (error) {
-    res.status(500).json({ status: 'error', message: 'An error occurred' });
-  }
-});
-
-productRouter.get('/:pid', async (req, res) => {
-  try {
-    const productId = parseInt(req.params.pid);
-    const product = await manager.getProductById(productId);
-
-    if (product) {
-      res.json(product);
-    } else {
-      res.status(404).json({ error: 'Producto no encontrado' });
+productsRouter.get('/', async (req, res) => {
+    const filters = {}
+    const { page = 1, limit = 10, sort, category, availability } = req.query
+    const sortOption = sort === 'asc' ? { price: 1 } : sort === 'desc' ? { price: -1 } : {};
+    const availabilityOption = availability === 'available' ? true : availability === 'notavailable' ? false : undefined;
+    const query = {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        sort: sortOption
     }
-  } catch (error) {
-    res.status(500).json({ error: 'Error interno del servidor' });
-  }
-});
 
-productRouter.post('/', async (req, res) => {
-  try {
-    const productData = req.body;
+    try {
 
-    const products = await manager.getProducts();
+        if (category) {
+            filters.category = category
+        }
 
-    const newProductId = products.length + 1;
+        if (availability) {
+            filters.status = availabilityOption;
+        }
 
-    const newProduct = { ...productData, id: newProductId };
+        const products = await productManager.getProducts(filters, query)
 
-    const createdProduct = await manager.addProduct(newProduct);
+        const generatePageLink = (page) => {
+            const newQuery = { ...req.query, ...filters, page: page };
+            return '/api/products?' + new URLSearchParams(newQuery).toString();
+        };
 
-    res.status(201).json(createdProduct);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al crear el producto' });
-  }
-});
+        return res.status(200).json({
+            status: 'success',
+            payload: products.docs,
+            totalPages: products.totalPages,
+            prevPage: products.prevPage,
+            nextPage: products.nextPage,
+            hasPrevPage: products.hasPrevPage,
+            hasNextPage: products.hasNextPage,
+            prevLink: products.hasPrevPage ? generatePageLink(products.prevPage) : null,
+            nextLink: products.hasNextPage ? generatePageLink(products.nextPage) : null
+        })
 
-productRouter.put('/:pid', async (req, res) => {
-  try {
-    const productId = parseInt(req.params.pid);
-    const updatedProductData = req.body;
-
-    const existingProduct = await manager.getProductById(productId);
-
-    if (existingProduct) {
-      const updatedProduct = await manager.updateProduct(productId, updatedProductData);
-
-      res.json(updatedProduct);
-    } else {
-      res.status(404).json({ error: 'Producto no encontrado' });
+    } catch (error) {
+        if (error.message === 'No se encuentran productos en nuestra base de datos') {
+            return res.status(404).json({ status: 'error', error: commonErrorMessage, message: error.message })
+        }
+        return res.status(500).json({ status: 'error', error: 'Error al obtener los productos', message: error.message })
     }
-  } catch (error) {
-    res.status(500).json({ error: 'Error al actualizar el producto' });
-  }
-});
+})
 
-module.exports = productRouter;
+productsRouter.get('/:pid', async (req, res) => {
+    const pid = req.params.pid
+    try {
+        const product = await productManager.getProductById(pid)
+        return res.status(200).json({ status: 'success', payload: product })
+    } catch (error) {
+        const commonErrorMessage = 'Error al obtener el producto'
+        if (error.message === 'Producto no encontrado') {
+            return res.status(404).json({ status: 'error', error: commonErrorMessage, message: error.message })
+        }
+        return res.status(500).json({ status: 'error', error: commonErrorMessage, message: error.message });
+    }
+})
+
+productsRouter.post('/', uploader.array('thumbnails', 3), async (req, res) => {
+    const newProduct = req.body;
+    const thumbnails = req.files.map((file) => file.path)
+    try {
+        await productManager.addProduct({ ...newProduct, thumbnails });
+        return res.status(201).json({ status: 'success', message: 'Producto agregado exitosamente' });
+    } catch (error) {
+        return res.status(500).json({ status: 'error', error: 'Error al agregar el producto', message: error.message });
+    }
+});
+ 
+productsRouter.put('/:pid', async (req, res) => {
+    const pid = req.params.pid
+    const updatedProduct = req.body
+
+    try {
+        await productManager.updateProduct(pid, updatedProduct)
+        return res.status(200).json({ status: 'success', message: 'Producto actualizado exitosamente' });
+    } catch (error) {
+        const commonErrorMessage = 'Error al actualizar el producto'
+        if (error.message === 'Producto no encontrado') {
+            return res.status(404).json({ status: 'error', error: commonErrorMessage, message: error.message })
+        }
+        if (error.code === 11000) {
+            return res.status(404).json({ status: 'error', error: commonErrorMessage, message: `El código ${updatedProduct.code} que ya se encuentra en uso` })
+        }
+        return res.status(500).json({ status: 'error', error: commonErrorMessage, message: error.message });
+    }
+})
+
+productsRouter.delete('/:pid', async (req, res) => {
+    const pid = req.params.pid
+    try {
+        await productManager.deleteProduct(pid)
+        return res.status(200).json({ status: 'success', message: 'Producto borrado exitosamente' });
+    } catch (error) {
+        const commonErrorMessage = 'Error al borrar el producto'
+        if (error.message === 'Producto no encontrado') {
+            return res.status(404).json({ status: 'error', error: commonErrorMessage, message: error.message })
+        }
+        return res.status(500).json({ status: 'error', error: commonErrorMessage, message: error.message });
+    }
+})
+
+module.exports = productsRouter

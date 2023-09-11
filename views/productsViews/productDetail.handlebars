@@ -1,0 +1,42 @@
+<header class="userProfile">
+    <a href="/profile" class="bold">Profile</a>
+    <div>
+        <p>Welcome <span class="bold">{{user.name}}</span>!</p>
+        {{#if user.lastname}} <p><span class="bold">Lastname: </span>{{user.lastname}}</p>{{/if}}
+        <p><span class="bold">Age: </span>{{user.age}}</p>
+        {{#if user.email}} <p><span class="bold">Email: </span>{{user.email}}</p> {{/if}}
+        <p><span class="bold">Role: </span>{{user.role}}</p>
+    </div>
+    <a href="/logout" class="logout">Logout</a>
+
+</header>
+
+<section class="productDetailContainer">
+    <h1>Product Detail</h1>
+    <article>
+        <h3>{{product.title}}</h3>
+        <p><span class="bold">Id: </span>{{product._id}}</p>
+        <p><span class="bold">Description: </span>{{product.description}}</p>
+        <p><span class="bold">Code: </span>{{product.code}}</p>
+        <p><span class="bold">Price: </span>${{product.price}}</p>
+        <p><span class="bold">Status: </span>
+            {{#if product.status}}
+            Available
+            {{else}}
+            Not Available
+            {{/if}}
+        </p>
+        <p><span class="bold">Stock: </span>{{product.stock}}</p>
+        <p><span class="bold">Category: </span>{{product.category}}</p>
+        <footer class="productDetailFooter">
+            <form id="{{product._id}}">
+                <input type="text" name="cartId" id="inputCartId" placeholder="Enter cart Id" required {{#unless
+                    product.status}}disabled{{/unless}}>
+                <button type="submit" {{#unless product.status}}disabled{{/unless}}>Add To Cart</button>
+            </form>
+        </footer>
+    </article>
+</section>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/productDetails.js"></script>

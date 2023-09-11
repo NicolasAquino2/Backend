@@ -1,0 +1,66 @@
+<header class="userProfile">
+    <a href="/profile" class="bold">Profile</a>
+    <div>
+        <p>Welcome <span class="bold">{{user.name}}</span>!</p>
+        {{#if user.lastname}} <p><span class="bold">Lastname: </span>{{user.lastname}}</p>{{/if}}
+        <p><span class="bold">Age: </span>{{user.age}}</p>
+        {{#if user.email}} <p><span class="bold">Email: </span>{{user.email}}</p> {{/if}}
+        <p><span class="bold">Role: </span>{{user.role}}</p>
+    </div>
+    <a href="/logout" class="logout">Logout</a>
+    {{#if user.admin}}
+    <a href="/realtimeproducts" class="bold">Edit inventory</a>
+    {{/if}}
+</header>
+<section class="productsContainer">
+    <h1>List of Products</h1>
+    {{#if noProducts}}
+    <p>No hay productos disponibles</p>
+    {{else}}
+    <table id="productos" class="table">
+        <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Options</th>
+        </tr>
+
+        {{#each products}}
+        <tr>
+            <td>{{this._id}}</td>
+            <td>{{this.title}}</td>
+            {{#if this.status}}
+            <td>Available</td>
+            {{else}}
+            <td>Not Available</td>
+            {{/if}}
+            <td>
+                <div class="productOptions">
+                    <a href="products/{{this._id}}"><i class="fas fa-info-circle"></i></a>
+                    {{#if this.status}}
+                    <form id="{{this._id}}">
+                        <input type="text" name="cartId" id="inputCartId" placeholder="Enter cart Id" required>
+                        <button type="submit">Add to Cart</button>
+                    </form>
+                    {{/if}}
+                </div>
+            </td>
+        </tr>
+        {{/each}}
+    </table>
+    {{/if}}
+    <article class="pagination">
+        <p>Page {{productsData.page}} de {{productsData.totalPages}}</p>
+        <div class="linksContainer">
+            {{#if productsData.hasPrevPage}}
+            <a href="{{generatePaginationLink productsData.prevPage}}" class="bold">Prev Page</a>
+            {{/if}}
+            {{#if productsData.hasNextPage}}
+            <a href="{{generatePaginationLink productsData.nextPage}}" class="bold">Next Page</a>
+            {{/if}}
+        </div>
+    </article>
+</section>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/products.js"></script>

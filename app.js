@@ -1,9 +1,8 @@
 const express = require('express');
 const handlebars = require('express-handlebars');
-const viewRouter = require('./routers/viewsRouter');
-const productRouter = require('./routers/productRouter');
 const { Server } = require('socket.io');
-const { setupSocketEvents } = require('./utils');
+const initializePassport = require('./config/passport.config')
+const flash = require('connect-flash')
 
 
 const app = express();
@@ -20,40 +19,49 @@ mongoose.connect(MONGODB_CONECT)
     process.exit(1);
   });
 
+ 
 
 
-
-const PORT = 8080;
-const server = app.listen(PORT, () => {
-  console.log(`Servidor corriendo en el puerto ${PORT}`);
-});
-
-
-const io = new Server(server);
-setupSocketEvents(io);
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-
-app.use(express.static('public'));
-
-
-
-
-
-
-
-app.engine('handlebars', handlebars.engine());
-app.set('view engine', 'handlebars')
-app.set('views', './views');
-
-
-app.use('/home', viewRouter);
-app.use('/realTimeProducts', viewRouter);
-app.use('/api/products/:id', viewRouter)
-app.use('/', productRouter)
-
-
-
-
+  app.use(flash())
+  initializePassport()
+  app.use(passport.initialize())
+  app.use(passport.session())
+  
+  // Configuración handlebars
+  app.engine('handlebars', handlebars.engine());
+  app.set('views', path.join(__dirname, 'views'));
+  app.set('view engine', 'handlebars')
+  
+  // Seteo de forma estática la carpeta public
+  app.use(express.static(__dirname + '/public'));
+  
+  // Crear el servidor HTTP
+  const httpServer = app.listen(8080, () => {
+      console.log(`Servidor express escuchando en el puerto 8080`);
+  });
+  
+  // Crear el objeto `io` para la comunicación en tiempo real
+  const io = new Server(httpServer);
+  handleSocketConnection(io);
+  
+  // Implementación de enrutadores
+  const productsRouter = require('./routes/productsRouter');
+  const cartsRouter = require('./routes/cartsRouter');
+  const viewsRouter = require('./routes/viewsRouter');
+  const sessionRouter = require('./routes/sessionRouter');
+  
+  // Rutas base de enrutadores
+  app.use('/api/products', productsRouter);
+  app.use('/api/carts', cartsRouter);
+  app.use('/api/sessions', sessionRouter);
+  app.use('/', viewsRouter);
+  
+  // Ruta de health check
+  app.get('/healthCheck', (req, res) => {
+      res.json({
+          status: 'running',
+          date: new Date(),
+      });
+  });
+  
+  module.exports = io
