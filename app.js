@@ -1,10 +1,14 @@
 const express = require('express');
+const path = require('path')
 const handlebars = require('express-handlebars');
-const { Server } = require('socket.io');
+const MongoStore = require('connect-mongo');
+const handleSocketConnection = require('./utils/socketHandlers')
+const { Server } = require('socket.io')
+const passport = require('passport')
 const initializePassport = require('./config/passport.config')
 const flash = require('connect-flash')
-
-
+const session = require('express-session');
+const cookieParser = require('cookie-parser')
 const app = express();
 
 const mongoose = require('mongoose')
@@ -20,6 +24,19 @@ mongoose.connect(MONGODB_CONECT)
   });
 
  
+  app.use(cookieParser('secretkey'))
+
+  // Configuración de session
+  app.use(session({
+      store: MongoStore.create({
+          mongoUrl: MONGODB_CONECT,
+          mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
+          ttl: 240,
+      }),
+      secret: 'secretkey',
+      resave: true,
+      saveUninitialized: true
+  }));
 
 
   app.use(flash())
@@ -45,10 +62,10 @@ mongoose.connect(MONGODB_CONECT)
   handleSocketConnection(io);
   
   // Implementación de enrutadores
-  const productsRouter = require('./routes/productsRouter');
-  const cartsRouter = require('./routes/cartsRouter');
-  const viewsRouter = require('./routes/viewsRouter');
-  const sessionRouter = require('./routes/sessionRouter');
+  const productsRouter = require('./routers/productRouter');
+  const cartsRouter = require('./routers/cartRouter');
+  const viewsRouter = require('./routers/viewsRouter');
+  const sessionRouter = require('./routers/sessionRouter');
   
   // Rutas base de enrutadores
   app.use('/api/products', productsRouter);

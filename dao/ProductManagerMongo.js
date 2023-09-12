@@ -1,35 +1,33 @@
-
-
 const productModel = require('../model/productModel')
 
 class ProductManagerMongo {
     constructor(io) {
         this.model = productModel
-        
         this.io = io
-        
     }
 
-
-    async getProducts() {
+    async getProducts(filters, query) {
         try {
-            const products = await this.model.find()
-          
-            return products.map(p => p.toObject())
+            const products = await this.model.paginate(filters, query)
+
+            if (products.length === 0) {
+                throw new Error('No se encuentran productos en nuestra base de datos')
+            }
+
+            return products
         } catch (error) {
             throw error
         }
     }
 
-    async getProductById(id) {
+    async getProductById(pid) {
         try {
-            const product = await this.model.findById(id)
-           
+            const product = await this.model.findById(pid)
             if (!product) {
                 throw new Error('No se encuentra el producto')
             }
-            
-            return product
+
+            return product.toObject()
         } catch (error) {
             throw error
         }
@@ -50,7 +48,7 @@ class ProductManagerMongo {
             ) {
                 throw new Error('Todos los campos son obligatorios');
             }
-           
+
             const exist = await productModel.findOne({ code: data.code });
 
             if (exist) {
@@ -90,7 +88,7 @@ class ProductManagerMongo {
             }
 
             const productUpdated = {
-                ...product.toObject(),
+                ...product,
                 ...data,
             };
 
@@ -123,7 +121,5 @@ class ProductManagerMongo {
     }
 
 }
-
-
 
 module.exports = ProductManagerMongo

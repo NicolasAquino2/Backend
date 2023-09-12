@@ -5,7 +5,7 @@ const CartManagerMongo = require('../dao/CartsManagerMongo')
 
 const handleSocketConnection = (io) => {
   const productManagerMongo = new ProductManagerMongo(io);
-  const messageManagerMongo = new MessageManagerMongo(io);
+
   const cartManagerMongo = new CartManagerMongo()
 
   io.on('connection', socket => {
