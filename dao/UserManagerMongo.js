@@ -1,4 +1,4 @@
-const userModel = require('../model/userModel')
+const userModel = require('./model/userModel')
 const { createHash } = require('../utils/passwordHash')
 
 class UserManager {
@@ -45,6 +45,7 @@ class UserManager {
                 email: data.email,
                 password: data.password !== '' ? createHash(data.password) : undefined
             })
+            console.log(newUser)
 
             return newUser
 

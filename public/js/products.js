@@ -9,6 +9,7 @@ productsForms.forEach(form => {
         const cid = form.querySelector('#inputCartId').value;
         const pid = form.getAttribute('id');
 
+    
         socket.emit('addProductToCart', { cid, pid })
 
         form.reset()

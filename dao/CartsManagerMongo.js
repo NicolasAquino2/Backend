@@ -1,5 +1,5 @@
-const cartModel = require('../model/cartModel')
-const productModel = require('../model/productModel')
+const cartModel = require('./model/cartModel')
+const productModel = require('./model/productModel')
 
 class CartManagerMongo {
     constructor() {

@@ -61,17 +61,21 @@ mongoose.connect(MONGODB_CONECT)
   const io = new Server(httpServer);
   handleSocketConnection(io);
   
-  // Implementación de enrutadores
-  const productsRouter = require('./routers/productRouter');
-  const cartsRouter = require('./routers/cartRouter');
-  const viewsRouter = require('./routers/viewsRouter');
-  const sessionRouter = require('./routers/sessionRouter');
+ // Implementación de enrutadores
+const ProductsRouter = require('./routers/productRouter')
+const productsRouter = new ProductsRouter()
+const CartsRouter = require('./routers/cartRouter')
+const cartsRouter = new CartsRouter()
+const ViewsRouter = require('./routers/viewsRouter')
+const viewsRouter = new ViewsRouter();
+const SessionRouter = require('./routers/viewsRouter');
+const sessionRouter = new SessionRouter()
   
-  // Rutas base de enrutadores
-  app.use('/api/products', productsRouter);
-  app.use('/api/carts', cartsRouter);
-  app.use('/api/sessions', sessionRouter);
-  app.use('/', viewsRouter);
+ // Rutas base de enrutadores
+app.use('/api/products', productsRouter.getRouter());
+app.use('/api/carts', cartsRouter.getRouter());
+app.use('/api/sessions', sessionRouter.getRouter());
+app.use('/', viewsRouter.getRouter());
   
   // Ruta de health check
   app.get('/healthCheck', (req, res) => {

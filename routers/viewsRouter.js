@@ -1,180 +1,166 @@
-const { Router } = require('express')
-const ProductManagerMongo = require('../dao/ProductManagerMongo');
-const productManager = new ProductManagerMongo
-const CartManagerMongo = require('../dao/CartsManagerMongo');
-const cartManager = new CartManagerMongo
-const viewsRouter = new Router()
-const { haveSession, requireAdmin, requireLogin } = require('../middlewares/sessionMiddlewares')
+const BaseRouter = require('./BaseRouter')
+const ProductManager = require('../dao/ProductManagerMongo')
+const productManager = new ProductManager()
+const CartManager = require('../dao/CartsManagerMongo');
+const cartManager = new CartManager()
+const { requireLogin, requireAdmin, haveSession } = require('../middlewares/sessionMiddlewares')
 
-/* VISTAS DE PRODUCTOS */
+class ViewsRouter extends BaseRouter {
 
-viewsRouter.get('/realtimeproducts', requireLogin, requireAdmin, async (req, res) => {
-    const user = req.user
-    const filters = {}
-    const { page = 1, limit = 10, sort, category, availability } = req.query
-    const sortOption = sort === 'asc' ? { price: 1 } : sort === 'desc' ? { price: -1 } : {};
-    const availabilityOption = availability === 'available' ? true : availability === 'notavailable' ? false : undefined;
-    const query = {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        sort: sortOption
-    }
-    try {
+    handleProductsRoutes = async (req, res, viewName) => {
+        const user = req.user;
+        const filters = {};
+        const { page = 1, limit = 10, sort, category, availability } = req.query;
+        const sortOption = sort === 'asc' ? { price: 1 } : sort === 'desc' ? { price: -1 } : {};
+        const availabilityOption = availability === 'available' ? true : availability === 'notavailable' ? false : undefined;
+        const query = {
+            page: parseInt(page),
+            limit: parseInt(limit),
+            sort: sortOption,
+        };
+
         if (category) {
-            filters.category = category
+            filters.category = category;
         }
 
         if (availability) {
             filters.status = availabilityOption;
         }
 
-        const productsData = await productManager.getProducts(filters, query);
-        const products = productsData.docs.map(p => p.toObject());
+        try {
+            const productsData = await productManager.getProducts(filters, query);
+            const products = productsData.docs.map(p => p.toObject());
+            const locals = {
+                title: viewName === 'productsViews/products' ? 'Products' : 'Real Time Products',
+                products: products,
+                productsData,
+                user,
+                generatePaginationLink: (page) => {
+                    const newQuery = { ...req.query, ...filters, page: page };
+                    return `/${viewName.split('/')[1]}?` + new URLSearchParams(newQuery).toString();
+                },
+            };
 
-        if (productsData.docs.length === 0) {
-            return res.render('realTimeProducts', { title: 'Real Time Products', style: 'styles.css', noProducts: true, user: user });
+            res.renderView({
+                view: viewName,
+                locals: locals,
+            });
+        } catch (error) {
+            res.renderView({
+                view: 'error', locals: { title: 'Error', errorMessage: error.message },
+            });
         }
-
-        return res.render('productsViews/realTimeProducts', {
-            title: 'Real Time Products', style: 'styles.css',
-            products: products, productsData, user: user,
-            generatePaginationLink: (page) => {
-                const newQuery = { ...req.query, ...filters, page: page };
-                return '/realtimeproducts?' + new URLSearchParams(newQuery).toString();
-            }
-        });
-    } catch (error) {
-        res.render('error', { title: 'Error', errorMessage: error.message });
     }
-})
 
-viewsRouter.get('/products', requireLogin, async (req, res) => {
-    const user = req.user
-    const filters = {}
-    const { page = 1, limit = 10, sort, category, availability } = req.query
-    const sortOption = sort === 'asc' ? { price: 1 } : sort === 'desc' ? { price: -1 } : {};
-    const availabilityOption = availability === 'available' ? true : availability === 'notavailable' ? false : undefined;
-    const query = {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        sort: sortOption
-    }
-    try {
-        if (category) {
-            filters.category = category
-        }
-
-        if (availability) {
-            filters.status = availabilityOption;
-        }
-
-        const productsData = await productManager.getProducts(filters, query);
-        const products = productsData.docs.map(p => p.toObject());
-
-
-        if (productsData.docs.length === 0) {
-            return res.render('products', { title: 'Products', style: 'styles.css', noProducts: true, user: user });
-        }
-
-        return res.render('productsViews/products', {
-            title: 'Products', style: 'styles.css',
-            products: products, productsData: productsData, user: user,
-            generatePaginationLink: (page) => {
-                const newQuery = { ...req.query, ...filters, page: page };
-                return '/products?' + new URLSearchParams(newQuery).toString();
-            }
+    init() {
+        this.get('/realtimeproducts', /* requireLogin, requireAdmin, */ async (req, res) => {
+            this.handleProductsRoutes(req, res, 'productsViews/realTimeProducts');
         });
 
-    } catch (error) {
-        res.render('error', { title: 'Error', errorMessage: error.message });
+        this.get('/products', requireLogin, async (req, res) => {
+            this.handleProductsRoutes(req, res, 'productsViews/products');
+        });
+
+        this.get('/products/:pid', requireLogin, async (req, res) => {
+            const user = req.user
+            const pid = req.params.pid
+            try {
+                const product = await productManager.getProductById(pid)
+                res.renderView({ view: 'productsViews/productDetail', locals: { title: 'Product Detail', product, user } })
+            } catch (error) {
+                res.renderView({
+                    view: 'error', locals: { title: 'Error', errorMessage: error.message },
+                });
+            }
+        })
+
+        this.get('/carts/:cid', requireLogin, async (req, res) => {
+            const user = req.user
+            const cid = req.params.cid
+            try {
+                const cart = await cartManager.getCartById(cid)
+                const productsInCart = cart[0].products.map(p => p.toObject());
+                res.renderView({ view: 'productsViews/cartDetail', locals: { title: 'Cart Detail', productsInCart, user } })
+            } catch (error) {
+                res.renderView({
+                    view: 'error', locals: { title: 'Error', errorMessage: error.message },
+                });
+            }
+        })
+
+        this.get('/chat', async (req, res) => {
+            try {
+                res.renderView({ view: 'chat', locals: { title: 'Chat' } })
+            } catch (error) {
+                res.renderView({
+                    view: 'error', locals: { title: 'Error', errorMessage: error.message },
+                });
+            }
+        })
+
+        this.get('/register', haveSession, async (req, res) => {
+            const messageError = req.flash('error')[0]
+            try {
+                res.renderView({ view: 'loginSystem/register', locals: { title: 'Register', messageError, hasError: messageError !== undefined } })
+            } catch (error) {
+                res.renderView({
+                    view: 'error', locals: { title: 'Error', errorMessage: error.message },
+                });
+            }
+        })
+
+        this.get('/', haveSession, async (req, res) => {
+            const messageError = req.flash('error')[0]
+            try {
+                res.renderView({ view: 'loginSystem/login', locals: { title: 'Login', messageError, hasError: messageError !== undefined } })
+            } catch (error) {
+                res.renderView({
+                    view: 'error', locals: { title: 'Error', errorMessage: error.message },
+                });
+            }
+        })
+
+        this.get('/recoverypassword', haveSession, async (req, res) => {
+            try {
+                res.renderView({ view: 'loginSystem/recoveryPassword', locals: { title: 'Recovery Password' } })
+            } catch (error) {
+                res.renderView({
+                    view: 'error', locals: { title: 'Error', errorMessage: error.message },
+                });
+            }
+        })
+
+        this.get('/profile', requireLogin, async (req, res) => {
+            const user = req.user
+            try {
+                res.renderView({ view: 'loginSystem/profile', locals: { user, title: 'Profile' } })
+            } catch (error) {
+                res.renderView({
+                    view: 'error', locals: { title: 'Error', errorMessage: error.message },
+                });
+            }
+        })
+
+        this.get('/logout', (req, res) => {
+            req.session.destroy(err => {
+                if (!err) {
+                    res.redirect('/')
+                } else {
+                    res.renderView({
+                        view: 'error', locals: { title: 'Error', errorMessage: err.message },
+                    });
+                }
+            })
+        })
+
+        this.get('/error', async (req, res) => {
+            const errorMessage = req.query.errorMessage || 'An error has occurred';
+            res.renderView({
+                view: 'error', locals: { title: 'Error', errorMessage: errorMessage }
+            });
+        });
+
     }
-})
+}
 
-viewsRouter.get('/products/:pid', requireLogin, async (req, res) => {
-    const user = req.user
-    const pid = req.params.pid
-    try {
-        const product = await productManager.getProductById(pid)
-        return res.render('productsViews/productDetail', { title: 'Product Detail', style: 'styles.css', product: product, user: user });
-    } catch (error) {
-        res.render('error', { title: 'Error', errorMessage: error.message });
-    }
-})
-
-/* VISTA DE CARRITO */
-
-viewsRouter.get('/carts/:cid', requireLogin, async (req, res) => {
-    const user = req.user
-    const cid = req.params.cid
-    try {
-        const cart = await cartManager.getCartById(cid)
-        const productsInCart = cart[0].products.map(p => p.toObject());
-        return res.render('productsViews/cartDetail', { title: 'Cart Detail', style: 'styles.css', productsInCart: productsInCart, user: user });
-    } catch (error) {
-        res.render('error', { title: 'Error', errorMessage: error.message });
-    }
-})
-
-
-/* VISTAS DE SISTEMA DE LOGIN */
-
-viewsRouter.get('/register', haveSession, async (req, res) => {
-    const messageError = req.flash('error')[0]
-    try {
-        return res.render('login/register', { title: 'Register', style: 'styles.css', messageError: messageError, hasError: messageError !== undefined });
-    } catch (error) {
-        res.render('error', { title: 'Error', errorMessage: error.message });
-    }
-})
-
-//LOGIN
-viewsRouter.get('/', haveSession, async (req, res) => {
-    const messageError = req.flash('error')[0]
-    try {
-        return res.render('login/login', { title: 'Login', style: 'styles.css', messageError: messageError, hasError: messageError !== undefined });
-    } catch (error) {
-        res.render('error', { title: 'Error', errorMessage: error.message });
-    }
-})
-
-viewsRouter.get('/recoverypassword', haveSession, async (req, res) => {
-    try {
-        return res.render('login/recoveryPassword', { title: 'Recovery Password', style: 'styles.css' });
-    } catch (error) {
-        res.render('error', { title: 'Error', errorMessage: error.message });
-    }
-})
-
-viewsRouter.get('/profile', requireLogin, (req, res) => {
-    try {
-        const user = req.user
-        return res.render('login/profile', { user: user, title: 'Profile', style: 'styles.css' })
-    } catch (error) {
-        return res.render('error', { title: 'Error', errorMessage: error.message });
-    }
-})
-
-viewsRouter.get('/logout', (req, res) => {
-    req.session.destroy(err => {
-        if (!err) {
-            return res.redirect('/')
-        } else {
-            return res.status(500).json({ status: 'error', error: 'Error al cerrar sesión', message: err.message });
-        }
-    })
-});
-
-/* VISTA DE ERROR */
-
-viewsRouter.get('/error', (req, res) => {
-    const errorMessage = req.query.errorMessage || 'Ha ocurrido un error';
-    if (errorMessage) {
-        res.render('error', { title: 'Error', errorMessage: errorMessage });
-    } else {
-        res.render('error', { title: 'Error', errorMessage: error.message });
-    }
-});
-
-
-
-module.exports = viewsRouter
+module.exports = ViewsRouter
