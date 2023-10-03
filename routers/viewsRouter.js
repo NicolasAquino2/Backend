@@ -88,15 +88,6 @@ class ViewsRouter extends BaseRouter {
             }
         })
 
-        this.get('/chat', async (req, res) => {
-            try {
-                res.renderView({ view: 'chat', locals: { title: 'Chat' } })
-            } catch (error) {
-                res.renderView({
-                    view: 'error', locals: { title: 'Error', errorMessage: error.message },
-                });
-            }
-        })
 
         this.get('/register', haveSession, async (req, res) => {
             const messageError = req.flash('error')[0]
@@ -109,7 +100,7 @@ class ViewsRouter extends BaseRouter {
             }
         })
 
-        this.get('/', haveSession, async (req, res) => {
+        this.get('/login', haveSession, async (req, res) => {
             const messageError = req.flash('error')[0]
             try {
                 res.renderView({ view: 'loginSystem/login', locals: { title: 'Login', messageError, hasError: messageError !== undefined } })

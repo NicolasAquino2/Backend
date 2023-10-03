@@ -24,7 +24,7 @@ class SessionRouter extends BaseRouter {
             scope: ['user:email']
         }));
 
-        this.get('/github-callback', passport.authenticate('github', { failureRedirect: '/' }),
+        this.get('/github-callback', passport.authenticate('github', { failureRedirect: '/login' }),
             (req, res) => {
                 req.session.user = req.user;
                 res.redirect('/products')

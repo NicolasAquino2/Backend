@@ -1,8 +1,7 @@
 const githubSt = require('passport-github2')
 const UserManagerMongo = require('../dao/UserManagerMongo')
 const userManager = new UserManagerMongo()
-//const CLIENT_ID = process.env.CLIENT_ID;
-//const CLIENT_SECRET = process.env.CLIENT_SECRET;
+
 
 const githubStrategy = new githubSt({
     clientID: 'd51b31fb9567266c544c',
@@ -12,7 +11,7 @@ const githubStrategy = new githubSt({
     
 
     try {
-        // console.log(profile)
+        //console.log(profile)
         let user = await userManager.getUserByUsername(profile.username)
 
         if (!user) {
